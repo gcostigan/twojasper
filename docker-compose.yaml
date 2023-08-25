@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+  database:
+    image: postgres:14
+    networks:
+      - jasper
+    container_name: database
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=jasper
+    volumes:
+      - database:/var/lib/postgresql/data
+  jasper1:
+    image: bitnami/jasperreports:8.2.0
+    networks:
+      - jasper
+    container_name: jasper1
+    ports:
+      - 8080:8080
+    depends_on:
+      - database
+    environment:
+      - JASPERREPORTS_USERNAME=jasperadmin
+      - JASPERREPORTS_PASSWORD=jasperadmin
+      - JASPERREPORTS_DATABASE_TYPE=postgresql
+      - JASPERREPORTS_DATABASE_HOST=database
+      - JASPERREPORTS_DATABASE_PORT_NUMBER=5432
+      - JASPERREPORTS_DATABASE_USER=${DB_USER}
+      - JASPERREPORTS_DATABASE_PASSWORD=${DB_PASSWORD}
+      - JASPERREPORTS_DATABASE_NAME=jasper
+
+volumes:
+  database:
+    driver: local
+
+networks:
+  jasper:
